@@ -13,6 +13,7 @@ import argparse
 import csv
 import itertools
 import json
+import os
 import subprocess
 
 import librosa
@@ -31,11 +32,14 @@ BEND_MIN = 50  # cents above the attack pitch before the tab marks a bend
 CHORD_WINDOW = 0.03  # seconds: notes starting this close together are one chord
 NUT_PULL = 0.1  # per fret: with equal hand movement and no hint, prefer the lower position
 HINT_PULL = 1.0  # per fret away from a note's "around" hint
+MAX_SECONDS = 600  # ~4 GB peak in pyin at the measured ~5.9 MB/s
 
 
 def load(path):
-    # ffmpeg decodes whatever the phone saved (m4a, aac, wav, ...) to mono float32
-    cmd = ["ffmpeg", "-v", "error", "-i", path, "-f", "f32le", "-ac", "1", "-ar", str(SR), "-"]
+    # ffmpeg decodes whatever the phone saved (m4a, aac, wav, ...) to mono float32, first MAX_SECONDS only.
+    # abspath + file-only whitelist: a name like "http:host#x.m4a" is a local file, never a URL
+    cmd = ["ffmpeg", "-v", "error", "-protocol_whitelist", "file", "-i", os.path.abspath(path),
+           "-t", str(MAX_SECONDS), "-f", "f32le", "-ac", "1", "-ar", str(SR), "-"]
     return np.frombuffer(subprocess.run(cmd, stdout=subprocess.PIPE, check=True).stdout, np.float32)
 
 
@@ -91,6 +95,8 @@ def chords(notes):
 
 def candidates(pitches):
     """Every playable (string, fret) assignment for pitches sounding together."""
+    if len(pitches) > len(OPEN):
+        return []  # more notes than strings can never be one chord
     options = [[(s, p - OPEN[s]) for s in range(6) if 0 <= p - OPEN[s] <= MAX_FRET] for p in pitches]
     out = []
     for combo in itertools.product(*options):

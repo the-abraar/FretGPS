@@ -113,9 +113,11 @@ Use a quiet room with the phone 30–50 cm from the soundhole or amp. Turn off a
 python fretmap.py recordings/05-riff.m4a                 # audio only
 python fretmap.py recordings/05-riff.m4a --around 7      # with a position hint
 python fretmap.py recordings/04-bends.m4a --json
-# chords: Basic Pitch first (Python 3.11: pip install basic-pitch onnxruntime "setuptools<81")
+# chords: Basic Pitch first, in its own venv so its old TensorFlow/Keras and setuptools stay out of .venv
+# (setuptools<81 because Basic Pitch pins resampy 0.4.2, which still imports pkg_resources)
+python3.11 -m venv .venv-bp && .venv-bp/bin/pip install basic-pitch onnxruntime "setuptools<81"
 ffmpeg -i recordings/05-riff.m4a recordings/05-riff.wav
-basic-pitch recordings/ recordings/05-riff.wav --save-note-events --model-serialization onnx
+.venv-bp/bin/basic-pitch recordings/ recordings/05-riff.wav --save-note-events --model-serialization onnx
 python fretmap.py recordings/05-riff_basic_pitch.csv
 ```
 
