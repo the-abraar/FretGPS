@@ -92,6 +92,8 @@ python fretmap.py ~/Downloads/riff.m4a --around 7   # tell it roughly where your
 python fretmap.py ~/Downloads/riff.m4a --json
 ```
 
+Only the first 10 minutes of a recording are analysed (`MAX_SECONDS` in `fretmap.py`), which keeps peak memory near 4 GB.
+
 ## Repo layout
 
 ```

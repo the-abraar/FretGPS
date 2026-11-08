@@ -1,7 +1,12 @@
-"""Self-check on a synthesized riff: python test_fretmap.py"""
+"""Self-check on a synthesized riff: python test_fretmap.py (needs ffmpeg on PATH)"""
+import os
+import subprocess
+import tempfile
+import time
+
 import numpy as np
 
-from fretmap import BEND_MIN, OPEN, SR, assign, candidates, detect_notes, tab
+from fretmap import BEND_MIN, MAX_SECONDS, OPEN, SR, assign, candidates, detect_notes, load, tab
 
 
 def pluck(midi, dur=0.4, bend_cents=0):
@@ -21,5 +26,22 @@ assert 170 <= bends[7] <= 230 and max(bends[:7] + bends[8:]) < BEND_MIN, bends  
 placed = assign(notes)
 assert all(OPEN[n["string"]] + n["fret"] == n["midi"] for n in placed)
 assert {s for s, _ in candidates([40, 47, 52])[0]} == {0, 1, 2}  # an E5 power chord uses three different strings
+t0 = time.time()
+assert candidates(list(range(55, 69))) == [] and time.time() - t0 < 0.1  # 14 notes can't fit 6 strings: reject before enumerating
+
+with tempfile.TemporaryDirectory() as d:
+    ff = ["ffmpeg", "-v", "error", "-y", "-f", "lavfi"]
+    # a 4-hour silent FLAC is ~1.5 MB on disk; load() must stop decoding at MAX_SECONDS
+    subprocess.run(ff + ["-i", "anullsrc=r=8000:cl=mono", "-t", "14400", "-c:a", "flac", "-sample_fmt", "s16", f"{d}/long.flac"], check=True)
+    assert len(load(f"{d}/long.flac")) <= MAX_SECONDS * SR
+    # a bare name that looks like a URL must open the local file, not reach the network
+    subprocess.run(ff + ["-i", "sine=f=440:d=1", f"{d}/http:127.0.0.1:1#x.wav"], check=True)
+    cwd = os.getcwd()
+    os.chdir(d)
+    try:
+        assert len(load("http:127.0.0.1:1#x.wav")) > 0.9 * SR
+    finally:
+        os.chdir(cwd)
+
 print(tab(placed))
 print("ok")
