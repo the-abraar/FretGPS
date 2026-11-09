@@ -17,6 +17,7 @@ Inverting this gives the continuous fret position for any detected hand point:
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 import os
@@ -37,7 +38,23 @@ LANDMARK_MAP = {
     "middle_tip": 12,
 }
 
-TASK_MODEL_URL = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task"
+# Pinned model version; the hash is checked before MediaPipe loads the file.
+TASK_MODEL_URL = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task"
+TASK_MODEL_SHA256 = "fbc2a30080c3c557093b5ddfc334698132eb341044ccee322ccf8bcf3607cde1"
+
+
+def ensure_model(model_path):
+    """Download the pinned hand landmarker model if missing; refuse it unless its SHA-256 matches."""
+    if not os.path.exists(model_path):
+        print(f"Downloading hand landmarker model to {model_path}...", file=sys.stderr)
+        tmp = model_path + ".part"
+        urllib.request.urlretrieve(TASK_MODEL_URL, tmp)
+        os.replace(tmp, model_path)
+    with open(model_path, "rb") as f:
+        digest = hashlib.sha256(f.read()).hexdigest()
+    if digest != TASK_MODEL_SHA256:
+        os.remove(model_path)
+        raise RuntimeError(f"{model_path} failed its SHA-256 check (got {digest}); removed it, re-run to download again")
 
 
 def fret_from_ratio(r: float) -> float:
@@ -100,9 +117,7 @@ class HandTracker:
 
             cache_dir = model_cache_dir or os.path.dirname(os.path.abspath(__file__))
             model_path = os.path.join(cache_dir, "hand_landmarker.task")
-            if not os.path.exists(model_path):
-                print(f"Downloading hand landmarker model to {model_path}...", file=sys.stderr)
-                urllib.request.urlretrieve(TASK_MODEL_URL, model_path)
+            ensure_model(model_path)
 
             options = HandLandmarkerOptions(
                 base_options=BaseOptions(model_asset_path=model_path),

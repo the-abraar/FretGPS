@@ -2,7 +2,6 @@
 
 import math
 import os
-import subprocess
 import sys
 import tempfile
 import cv2
@@ -14,6 +13,7 @@ from camera_hint import (
     project_point_to_neck,
     write_csv,
     process_video,
+    ensure_model,
 )
 
 
@@ -93,6 +93,20 @@ def test_csv_output():
             os.remove(tmp_path)
 
 
+def test_model_checksum_rejects_tampered_file():
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "hand_landmarker.task")
+        with open(path, "wb") as f:
+            f.write(b"not the model")
+        try:
+            ensure_model(path)
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("tampered model was accepted")
+        assert not os.path.exists(path)
+
+
 def test_video_pipeline():
     """Verify video loading, processing, and hint output end-to-end on a test video."""
     with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as f:
@@ -121,5 +135,6 @@ if __name__ == "__main__":
     test_fret_math()
     test_neck_projection()
     test_csv_output()
+    test_model_checksum_rejects_tampered_file()
     test_video_pipeline()
     print("ok")
