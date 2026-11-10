@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FretGPS fretboard demo</title>
+<meta name="description" content="Audio knows the pitch, not the place. Move the 'I'm around fret N' slider and watch string ID jump on a real GuitarSet solo.">
+<style>
+:root{--bg:#f8fafc;--card:#fff;--ink:#18181b;--muted:#52525b;--line:#e4e4e7;--wood:#f3ede4;--right:#2563eb;--wrong:#ea580c;--ghost:#a1a1aa;--warn:#b45309}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0b0d;--card:#17171a;--ink:#f4f4f5;--muted:#a1a1aa;--line:#2e2e33;--wood:#221d18;--right:#60a5fa;--wrong:#fb923c;--ghost:#71717a;--warn:#fbbf24}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:16px}
+.banner{border:1px solid var(--warn);border-left:6px solid var(--warn);background:var(--card);border-radius:8px;padding:10px 14px;font-size:14px}
+h1{font-size:clamp(1.8rem,6vw,2.6rem);margin:18px 0 4px;letter-spacing:-.02em}h2{font-size:1.2rem;margin:28px 0 8px}
+.muted{color:var(--muted)}a{color:var(--right)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:12px}
+.modes{display:flex;flex-wrap:wrap;gap:8px}
+.modes label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;cursor:pointer}
+.modes label:has(input:checked){border-color:var(--right)}
+.slider{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.slider input{flex:1;min-width:160px}
+.score{font-size:1.6rem;font-weight:700;margin-top:10px}
+.boardwrap{overflow-x:auto;margin-top:10px}svg{width:100%;min-width:640px;height:auto;display:block}
+.key{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-2px;margin-right:4px}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}td.n{text-align:right;font-variant-numeric:tabular-nums}
+.tbl{overflow-x:auto}
+</style>
+</head>
+<body>
+<main>
+<div class="banner" role="note"><strong>What is real and what is simulated:</strong> the notes are the first 12 s of a real GuitarSet solo (<code>04_Jazz1-130-D</code>), with the true string and fret from a hexaphonic pickup. There is no audio here. The pitches go in exactly, with the strings hidden, so this shows only the <em>placement</em> step of <code>fretmap.py</code>, ported to JavaScript. The hint is set by you, so it is perfect. Every hint result here is an <strong>upper bound</strong> on what a real "around fret N" or a camera would get.</div>
+
+<h1>Audio knows the pitch, not the place</h1>
+<p class="muted">Most notes on a guitar can be played in 2 to 5 places. The circles are where the player actually was. The dots are where the software guessed. A guess is blue when it is on the right string and orange when it is wrong.</p>
+
+<div class="card">
+<div class="modes" role="radiogroup" aria-label="Placement">
+<label><input type="radio" name="mode" value="lowest"> Tuner app (lowest fret)</label>
+<label><input type="radio" name="mode" value="least" checked> Audio only (least hand movement)</label>
+<label><input type="radio" name="mode" value="around"> With your hint</label>
+</div>
+<div class="slider"><label for="around">I'm around fret <b id="aroundVal">7</b></label><input id="around" type="range" min="0" max="15" value="7"></div>
+<p class="muted" style="margin:6px 0 0;font-size:14px">Try a wrong hint too. On this solo "around 12" puts 1 note of 28 on the right string, which is worse than no hint at all.</p>
+<div class="score" id="score" role="status"></div>
+<div class="boardwrap"><svg id="board" viewBox="0 0 900 250" role="img" aria-label="Fretboard with the true and guessed position of each note"></svg></div>
+<div class="key"><span><span class="dot" style="border:2px solid var(--ghost)"></span>where it was played</span><span><span class="dot" style="background:var(--right)"></span>guess on the right string</span><span><span class="dot" style="background:var(--wrong)"></span>guess on the wrong string</span><span>numbers are frets</span></div>
+</div>
+
+<h2>The same three rules on all 180 GuitarSet solos</h2>
+<div class="tbl"><table>
+<thead><tr><th>Placement (true pitches, strings hidden)</th><th class="n">Right string</th></tr></thead>
+<tbody>
+<tr><td>Lowest fret (what a tuner app shows)</td><td class="n">31.0%</td></tr>
+<tr><td>Least hand movement (<code>fretmap.py</code>)</td><td class="n">43.4%</td></tr>
+<tr><td>+ one "around fret N" per take, <strong>upper bound</strong> (ideal hint)</td><td class="n">79.3%</td></tr>
+<tr><td>+ a rolling hint over ±2 s, like a camera would see, <strong>upper bound</strong></td><td class="n">88.6%</td></tr>
+</tbody></table></div>
+<p class="muted">Reproduce: <code>python eval_guitarset.py GUITARSET_DIR</code> in <a href="https://github.com/the-abraar/FretGPS/tree/main/experiments/phone-audio">experiments/phone-audio</a>. The method and its limits are in <a href="https://github.com/the-abraar/FretGPS/blob/main/LEARNINGS.md">LEARNINGS.md</a>. Data: GuitarSet, Xi et al., ISMIR 2018, <a href="https://zenodo.org/records/3371780">CC BY 4.0</a>.</p>
+</main>
+
+<script id="riff" type="application/json">{"source":"GuitarSet 04_Jazz1-130-D_solo, first 12 s (Xi et al., ISMIR 2018, CC BY 4.0, zenodo.org/records/3371780)","notes":[{"start":0.009,"end":0.27,"midi":69,"true_string":5,"true_fret":5},{"start":0.764,"end":0.961,"midi":71,"true_string":5,"true_fret":7},{"start":2.615,"end":2.725,"midi":62,"true_string":3,"true_fret":7},{"start":2.799,"end":3.043,"midi":66,"true_string":4,"true_fret":7},{"start":3.081,"end":3.209,"midi":69,"true_string":5,"true_fret":5},{"start":3.246,"end":3.513,"midi":71,"true_string":5,"true_fret":7},{"start":3.246,"end":3.507,"midi":71,"true_string":4,"true_fret":12},{"start":3.734,"end":3.955,"midi":72,"true_string":5,"true_fret":8},{"start":3.96,"end":4.053,"midi":70,"true_string":5,"true_fret":6},{"start":4.169,"end":4.43,"midi":71,"true_string":5,"true_fret":7},{"start":4.47,"end":5.08,"midi":69,"true_string":5,"true_fret":5},{"start":5.138,"end":5.341,"midi":67,"true_string":4,"true_fret":8},{"start":5.392,"end":5.56,"midi":64,"true_string":4,"true_fret":5},{"start":5.562,"end":5.934,"midi":66,"true_string":4,"true_fret":7},{"start":6.001,"end":6.297,"midi":69,"true_string":5,"true_fret":5},{"start":6.287,"end":6.472,"midi":66,"true_string":4,"true_fret":7},{"start":6.628,"end":6.913,"midi":64,"true_string":4,"true_fret":5},{"start":6.929,"end":7.213,"midi":62,"true_string":3,"true_fret":7},{"start":7.241,"end":7.892,"midi":65,"true_string":4,"true_fret":6},{"start":8.65,"end":8.836,"midi":57,"true_string":2,"true_fret":7},{"start":9.067,"end":9.456,"midi":59,"true_string":3,"true_fret":4},{"start":9.505,"end":9.65,"midi":62,"true_string":3,"true_fret":7},{"start":9.654,"end":9.915,"midi":62,"true_string":3,"true_fret":7},{"start":9.916,"end":10.015,"midi":59,"true_string":3,"true_fret":4},{"start":10.172,"end":10.474,"midi":62,"true_string":3,"true_fret":7},{"start":10.595,"end":10.873,"midi":64,"true_string":4,"true_fret":5},{"start":10.875,"end":11.02,"midi":65,"true_string":4,"true_fret":6},{"start":11.022,"end":11.712,"midi":66,"true_string":4,"true_fret":7}]}</script>
+<script>
+// Port of fretmap.py's placement (chords, candidates, position, assign) and eval_guitarset.py's lowest_fret.
+const OPEN = [40, 45, 50, 55, 59, 64], MAX_FRET = 20, MAX_SPAN = 4, CHORD_WINDOW = 0.03, NUT_PULL = 0.1, HINT_PULL = 1.0;
+function chords(notes) {
+  const groups = [];
+  for (const n of [...notes].sort((a, b) => a.start - b.start)) {
+    if (groups.length && n.start - groups[groups.length - 1][0].start < CHORD_WINDOW) groups[groups.length - 1].push(n);
+    else groups.push([n]);
+  }
+  return groups;
+}
+function candidates(pitches) {
+  if (pitches.length > OPEN.length) return [];
+  const options = pitches.map(p => [0, 1, 2, 3, 4, 5].filter(s => p - OPEN[s] >= 0 && p - OPEN[s] <= MAX_FRET).map(s => [s, p - OPEN[s]]));
+  let combos = [[]];
+  for (const o of options) combos = combos.flatMap(c => o.map(x => [...c, x]));  // itertools.product order
+  return combos.filter(c => {
+    const fretted = c.map(x => x[1]).filter(f => f);
+    return new Set(c.map(x => x[0])).size === c.length && (!fretted.length || Math.max(...fretted) - Math.min(...fretted) <= MAX_SPAN);
+  });
+}
+const position = c => { const f = c.map(x => x[1]).filter(f => f); return f.length ? Math.min(...f) : 0; };
+const argmin = a => a.reduce((k, v, i) => (v < a[k] ? i : k), 0);  // first minimum, like numpy
+function assign(notes, around) {    // around: undefined = no hint
+  const steps = chords(notes).map(g => [g, candidates(g.map(n => n.midi))]).filter(([, c]) => c.length);
+  if (!steps.length) return [];
+  const pos = steps.map(([, c]) => c.map(position));
+  const pull = pos.map(p => p.map(x => around === undefined ? NUT_PULL * x : HINT_PULL * Math.abs(x - around)));
+  let total = pull[0];
+  const back = [];
+  for (let i = 1; i < steps.length; i++) {
+    const b = [], t = [];
+    pos[i].forEach((pk, k) => {
+      const col = total.map((tj, j) => tj + Math.abs(pos[i - 1][j] - pk));
+      const j = argmin(col);
+      b.push(j); t.push(col[j] + pull[i][k]);
+    });
+    back.push(b); total = t;
+  }
+  let k = argmin(total);
+  const out = steps.map(([g]) => g.map(n => ({...n})));
+  for (let i = steps.length - 1; i >= 0; i--) {
+    out[i].forEach((n, m) => { [n.string, n.fret] = steps[i][1][k][m]; });
+    if (i) k = back[i - 1][k];
+  }
+  return out.flat();
+}
+function lowestFret(notes) {
+  return notes.map(n => {
+    const s = Math.max(...[0, 1, 2, 3, 4, 5].filter(s => n.midi - OPEN[s] >= 0 && n.midi - OPEN[s] <= MAX_FRET));
+    return {...n, string: s, fret: n.midi - OPEN[s]};
+  });
+}
+function place(notes, mode, around) {
+  return mode === 'lowest' ? lowestFret(notes) : assign(notes, mode === 'around' ? around : undefined);
+}
+
+// Drawing
+const RIFF = JSON.parse(document.getElementById('riff').textContent);
+const FRETS = 17, X0 = 52, DX = (900 - X0 - 10) / FRETS, Y0 = 25, DY = 36;
+const fx = f => f === 0 ? X0 - 16 : X0 + (f - 0.5) * DX, sy = s => Y0 + (5 - s) * DY;  // high e on top, like tab
+function draw() {
+  const mode = document.querySelector('[name=mode]:checked').value, around = +document.getElementById('around').value;
+  document.getElementById('aroundVal').textContent = around;
+  const placed = place(RIFF.notes, mode, around), right = placed.filter(n => n.string === n.true_string).length;
+  const pct = Math.round(100 * right / RIFF.notes.length);
+  document.getElementById('score').textContent = `${right} of ${RIFF.notes.length} notes on the right string (${pct}%)` + (mode === 'around' ? ', upper bound' : '');
+  let g = `<rect x="${X0}" y="${Y0 - 12}" width="${FRETS * DX}" height="${5 * DY + 24}" fill="var(--wood)" rx="4"/>`;
+  for (let f = 0; f <= FRETS; f++) g += `<line x1="${X0 + f * DX}" x2="${X0 + f * DX}" y1="${Y0 - 12}" y2="${Y0 + 5 * DY + 12}" stroke="var(--ghost)" stroke-width="${f ? 1.5 : 5}"/>`;
+  for (const f of [3, 5, 7, 9, 12, 15]) g += `<text x="${fx(f)}" y="${Y0 + 5 * DY + 32}" text-anchor="middle" font-size="13" fill="var(--muted)">${f}</text>`;
+  ['E', 'A', 'D', 'G', 'B', 'e'].forEach((name, s) => {
+    g += `<line x1="${X0}" x2="${X0 + FRETS * DX}" y1="${sy(s)}" y2="${sy(s)}" stroke="var(--muted)" stroke-width="${1 + (5 - s) * 0.3}"/>`;
+    g += `<text x="6" y="${sy(s) + 5}" font-size="14" fill="var(--muted)">${name}</text>`;
+  });
+  const seen = new Set();
+  for (const n of RIFF.notes) { const key = n.true_string + ':' + n.true_fret; if (seen.has(key)) continue; seen.add(key);
+    g += `<circle cx="${fx(n.true_fret)}" cy="${sy(n.true_string)}" r="15" fill="none" stroke="var(--ghost)" stroke-width="2.5"/>`; }
+  const dots = new Map();
+  for (const n of placed) { const key = n.string + ':' + n.fret; dots.set(key, [n, (dots.get(key)?.[1] || 0) + 1, (dots.get(key)?.[2] || 0) + (n.string === n.true_string)]); }
+  for (const [n, count, ok] of dots.values()) {
+    const c = ok === count ? 'var(--right)' : 'var(--wrong)';
+    g += `<g><title>${count} note${count > 1 ? 's' : ''} at string ${6 - n.string}, fret ${n.fret}</title><circle cx="${fx(n.fret)}" cy="${sy(n.string)}" r="10" fill="${c}"/><text x="${fx(n.fret)}" y="${sy(n.string) + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${n.fret}</text></g>`;
+  }
+  document.getElementById('board').innerHTML = g;
+}
+document.querySelectorAll('[name=mode]').forEach(r => r.addEventListener('change', draw));
+document.getElementById('around').addEventListener('input', () => { document.querySelector('[value=around]').checked = true; draw(); });
+draw();
+</script>
+</body>
+</html>
