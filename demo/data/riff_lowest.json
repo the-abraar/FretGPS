@@ -1,0 +1,260 @@
+{
+ "source": "GuitarSet 04_Jazz1-130-D_solo, first 12 s (Xi et al., ISMIR 2018, CC BY 4.0, zenodo.org/records/3371780)",
+ "placement": "lowest",
+ "notes_in": 28,
+ "right_string": 9,
+ "notes": [
+  {
+   "start": 0.009,
+   "end": 0.27,
+   "midi": 69,
+   "true_string": 5,
+   "true_fret": 5,
+   "string": 5,
+   "fret": 5
+  },
+  {
+   "start": 0.764,
+   "end": 0.961,
+   "midi": 71,
+   "true_string": 5,
+   "true_fret": 7,
+   "string": 5,
+   "fret": 7
+  },
+  {
+   "start": 2.615,
+   "end": 2.725,
+   "midi": 62,
+   "true_string": 3,
+   "true_fret": 7,
+   "string": 4,
+   "fret": 3
+  },
+  {
+   "start": 2.799,
+   "end": 3.043,
+   "midi": 66,
+   "true_string": 4,
+   "true_fret": 7,
+   "string": 5,
+   "fret": 2
+  },
+  {
+   "start": 3.081,
+   "end": 3.209,
+   "midi": 69,
+   "true_string": 5,
+   "true_fret": 5,
+   "string": 5,
+   "fret": 5
+  },
+  {
+   "start": 3.246,
+   "end": 3.513,
+   "midi": 71,
+   "true_string": 5,
+   "true_fret": 7,
+   "string": 5,
+   "fret": 7
+  },
+  {
+   "start": 3.246,
+   "end": 3.507,
+   "midi": 71,
+   "true_string": 4,
+   "true_fret": 12,
+   "string": 5,
+   "fret": 7
+  },
+  {
+   "start": 3.734,
+   "end": 3.955,
+   "midi": 72,
+   "true_string": 5,
+   "true_fret": 8,
+   "string": 5,
+   "fret": 8
+  },
+  {
+   "start": 3.96,
+   "end": 4.053,
+   "midi": 70,
+   "true_string": 5,
+   "true_fret": 6,
+   "string": 5,
+   "fret": 6
+  },
+  {
+   "start": 4.169,
+   "end": 4.43,
+   "midi": 71,
+   "true_string": 5,
+   "true_fret": 7,
+   "string": 5,
+   "fret": 7
+  },
+  {
+   "start": 4.47,
+   "end": 5.08,
+   "midi": 69,
+   "true_string": 5,
+   "true_fret": 5,
+   "string": 5,
+   "fret": 5
+  },
+  {
+   "start": 5.138,
+   "end": 5.341,
+   "midi": 67,
+   "true_string": 4,
+   "true_fret": 8,
+   "string": 5,
+   "fret": 3
+  },
+  {
+   "start": 5.392,
+   "end": 5.56,
+   "midi": 64,
+   "true_string": 4,
+   "true_fret": 5,
+   "string": 5,
+   "fret": 0
+  },
+  {
+   "start": 5.562,
+   "end": 5.934,
+   "midi": 66,
+   "true_string": 4,
+   "true_fret": 7,
+   "string": 5,
+   "fret": 2
+  },
+  {
+   "start": 6.001,
+   "end": 6.297,
+   "midi": 69,
+   "true_string": 5,
+   "true_fret": 5,
+   "string": 5,
+   "fret": 5
+  },
+  {
+   "start": 6.287,
+   "end": 6.472,
+   "midi": 66,
+   "true_string": 4,
+   "true_fret": 7,
+   "string": 5,
+   "fret": 2
+  },
+  {
+   "start": 6.628,
+   "end": 6.913,
+   "midi": 64,
+   "true_string": 4,
+   "true_fret": 5,
+   "string": 5,
+   "fret": 0
+  },
+  {
+   "start": 6.929,
+   "end": 7.213,
+   "midi": 62,
+   "true_string": 3,
+   "true_fret": 7,
+   "string": 4,
+   "fret": 3
+  },
+  {
+   "start": 7.241,
+   "end": 7.892,
+   "midi": 65,
+   "true_string": 4,
+   "true_fret": 6,
+   "string": 5,
+   "fret": 1
+  },
+  {
+   "start": 8.65,
+   "end": 8.836,
+   "midi": 57,
+   "true_string": 2,
+   "true_fret": 7,
+   "string": 3,
+   "fret": 2
+  },
+  {
+   "start": 9.067,
+   "end": 9.456,
+   "midi": 59,
+   "true_string": 3,
+   "true_fret": 4,
+   "string": 4,
+   "fret": 0
+  },
+  {
+   "start": 9.505,
+   "end": 9.65,
+   "midi": 62,
+   "true_string": 3,
+   "true_fret": 7,
+   "string": 4,
+   "fret": 3
+  },
+  {
+   "start": 9.654,
+   "end": 9.915,
+   "midi": 62,
+   "true_string": 3,
+   "true_fret": 7,
+   "string": 4,
+   "fret": 3
+  },
+  {
+   "start": 9.916,
+   "end": 10.015,
+   "midi": 59,
+   "true_string": 3,
+   "true_fret": 4,
+   "string": 4,
+   "fret": 0
+  },
+  {
+   "start": 10.172,
+   "end": 10.474,
+   "midi": 62,
+   "true_string": 3,
+   "true_fret": 7,
+   "string": 4,
+   "fret": 3
+  },
+  {
+   "start": 10.595,
+   "end": 10.873,
+   "midi": 64,
+   "true_string": 4,
+   "true_fret": 5,
+   "string": 5,
+   "fret": 0
+  },
+  {
+   "start": 10.875,
+   "end": 11.02,
+   "midi": 65,
+   "true_string": 4,
+   "true_fret": 6,
+   "string": 5,
+   "fret": 1
+  },
+  {
+   "start": 11.022,
+   "end": 11.712,
+   "midi": 66,
+   "true_string": 4,
+   "true_fret": 7,
+   "string": 5,
+   "fret": 2
+  }
+ ]
+}
